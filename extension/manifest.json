@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "ProBugs",
+  "version": "1.2.0",
+  "description": "Report bugs directly to your ProBugs dashboard.",
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "host_permissions": [
+    "http://localhost:5000/*"
+  ]
+}

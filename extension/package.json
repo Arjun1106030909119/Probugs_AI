@@ -1,0 +1,6 @@
+{
+  "name": "probugs-extension",
+  "version": "1.2.0",
+  "private": true,
+  "description": "ProBugs Browser Extension"
+}
