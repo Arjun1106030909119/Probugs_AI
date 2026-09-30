@@ -3,7 +3,7 @@
   "installCommand": "npm ci --include=optional",
   "outputDirectory": "dist",
   "env": {
-    "VITE_API_URL": "/api",
+    "VITE_API_URL": "https://probugs-backend.onrender.com",
     "VITE_SOCKET_URL": "https://probugs-backend.onrender.com"
   },
   "rewrites": [

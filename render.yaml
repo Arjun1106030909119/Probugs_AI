@@ -48,6 +48,6 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_URL
-        value: /api    # relative — works because /api is proxied to the backend above
+        value: https://probugs-backend.onrender.com
       - key: VITE_SOCKET_URL
         value: https://probugs-backend.onrender.com

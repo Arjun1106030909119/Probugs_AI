@@ -4,6 +4,14 @@ import App from './App.jsx'
 import './index.css'
 import axios from 'axios'
 
+// In production on Render, call the API service directly. The static-site
+// rewrite is optional; using the backend origin avoids 404s when that rewrite
+// has not been synced to an existing Render service.
+const apiUrl = import.meta.env.VITE_API_URL;
+if (apiUrl && apiUrl !== '/api') {
+    axios.defaults.baseURL = apiUrl.replace(/\/$/, '');
+}
+
 // Global Axios Interceptor
 axios.interceptors.request.use(
     (config) => {
