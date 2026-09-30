@@ -30,6 +30,13 @@ app.get('/', (req, res) => {
     res.send('AI Ticket Management System API is running...');
 });
 
+app.get('/health', (req, res) => {
+    res.status(mongoose.connection.readyState === 1 ? 200 : 503).json({
+        ok: mongoose.connection.readyState === 1,
+        database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+    });
+});
+
 app.get('/api/debug-headers', (req, res) => {
     res.json({
         headers: req.headers,
@@ -123,11 +130,6 @@ const connectDB = async () => {
             serverSelectionTimeoutMS: 5000
         });
         console.log('✅ Connected to MongoDB successfully!');
-
-        server.listen(PORT, '0.0.0.0', () => {
-            console.log(`🚀 Server listening at http://localhost:${PORT}`);
-            console.log('Real-time sync enabled via Socket.io');
-        });
     } catch (err) {
         console.error('❌ CRITICAL: MongoDB connection failed!');
         console.error('Error:', err.message);
@@ -135,5 +137,10 @@ const connectDB = async () => {
         setTimeout(connectDB, 5000);
     }
 };
+
+server.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Server listening on port ${PORT}`);
+    console.log('Real-time sync enabled via Socket.io');
+});
 
 connectDB();

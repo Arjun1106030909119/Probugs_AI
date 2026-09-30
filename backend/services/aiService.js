@@ -25,36 +25,43 @@ exports.analyzeTicket = async (title, description) => {
     let predictedCategory = 'Unknown';
     let predictedPriority = 'Low';
     let explanation = [];
-    let confidence = 0.5;
+    
+    let totalKeywordMatches = 0;
 
     // 1. Categorization Logic
     for (const [category, keywords] of Object.entries(KEYWORDS)) {
         const matches = keywords.filter(k => text.includes(k));
         if (matches.length > 0) {
-            predictedCategory = category;
-            explanation.push(`Detected keywords related to ${category}: ${matches.join(', ')}`);
-            confidence += 0.1 * matches.length;
-            break;
+            if (predictedCategory === 'Unknown') {
+                predictedCategory = category;
+                explanation.push(`Detected keywords related to ${category}: ${matches.join(', ')}`);
+            }
+            totalKeywordMatches += matches.length;
         }
     }
 
     // 2. Priority Logic
     const criticalMatches = CRITICAL_KEYWORDS.filter(k => text.includes(k));
-    if (criticalMatches.length > 1 || text.includes('100% failure')) {
+    totalKeywordMatches += criticalMatches.length;
+
+    if (criticalMatches.length >= 2) {
         predictedPriority = 'Urgent';
         explanation.push(`High urgency detected due to terms like: ${criticalMatches.join(', ')}`);
-        confidence += 0.2;
     } else if (criticalMatches.length === 1) {
         predictedPriority = 'High';
         explanation.push(`Elevated priority based on term: ${criticalMatches[0]}`);
-        confidence += 0.1;
+    } else {
+        predictedPriority = 'Low';
     }
+
+    // Calculate Confidence Score
+    let confidence = 0.50 + (totalKeywordMatches * 0.10);
 
     // 3. SLA Risk Calculation
     let slaRisk = 0.1;
     if (predictedPriority === 'Urgent') slaRisk = 0.9;
     else if (predictedPriority === 'High') slaRisk = 0.6;
-    else if (predictedPriority === 'Medium') slaRisk = 0.3;
+    else if (predictedPriority === 'Low') slaRisk = 0.1;
 
     // 4. Solution Suggestion (New Automation Feature)
     const categorySolutions = {
@@ -67,7 +74,7 @@ exports.analyzeTicket = async (title, description) => {
 
     let predictedSolution = categorySolutions[predictedCategory] || "Our AI is analyzing this issue. Initial recommendation: gather more logs and verify the problem with the user.";
 
-    // Normalize confidence
+    // Normalize confidence to cap at 0.99
     confidence = Math.min(0.99, confidence);
 
     return {

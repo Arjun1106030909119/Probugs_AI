@@ -13,7 +13,9 @@ export const AuthProvider = ({ children }) => {
             if (token) {
                 try {
                     const res = await axios.get('/api/auth/me');
-                    setUser(res.data.data);
+                    if (res.data && res.data.data) {
+                        setUser(res.data.data);
+                    }
                 } catch (err) {
                     localStorage.removeItem('token');
                 }

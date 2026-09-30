@@ -11,7 +11,8 @@
   "scripts": {
     "dev": "concurrently \"npm run dev -w backend\" \"npm run dev -w frontend\"",
     "install:all": "npm install",
-    "build:all": "npm run build -w frontend && npm run build -w backend"
+    "build:all": "npm run build -w frontend && npm run build -w backend && npm run build:extension",
+    "build:extension": "node build_ext.js"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"

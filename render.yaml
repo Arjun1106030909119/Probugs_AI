@@ -1,0 +1,53 @@
+services:
+  # ─────────────────────────────────────────────
+  # BACKEND  –  Node/Express + Socket.io API
+  # ─────────────────────────────────────────────
+  - type: web
+    name: probugs-backend
+    runtime: node
+    region: oregon          # pick the region closest to your users
+    plan: free              # change to "starter" or higher for always-on
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && npm start   # uses "node server.js", NOT nodemon
+    healthCheckPath: /health # Confirms both the process and MongoDB are ready
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000        # Render assigns port 10000 by default; server.js already reads process.env.PORT
+      - key: MONGODB_URI
+        sync: false         # set this manually in the Render dashboard (use MongoDB Atlas URI)
+      - key: JWT_SECRET
+        sync: false         # set this manually in the Render dashboard
+
+  # ─────────────────────────────────────────────
+  # FRONTEND  –  Vite/React Static Site
+  # ─────────────────────────────────────────────
+  - type: web
+    name: probugs-frontend
+    runtime: static
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/dist   # Vite outputs to frontend/dist
+    pullRequestPreviewsEnabled: false
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: no-cache
+    routes:
+      # Proxy /api/* and /socket.io/* to the backend so the frontend
+      # never needs CORS and can use relative /api paths (which it already does).
+      - type: rewrite
+        source: /api/*
+        destination: https://probugs-backend.onrender.com/api/:splat
+      - type: rewrite
+        source: /socket.io/*
+        destination: https://probugs-backend.onrender.com/socket.io/:splat
+      # SPA fallback — send all other routes to index.html
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        value: /api    # relative — works because /api is proxied to the backend above
+      - key: VITE_SOCKET_URL
+        value: https://probugs-backend.onrender.com

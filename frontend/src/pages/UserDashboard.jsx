@@ -226,7 +226,7 @@ const UserDashboard = () => {
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-2">Urgency</label>
+                                <label className="block text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-2">AI Ticket Classification</label>
                                 <select
                                     name="priority"
                                     value={formData.priority}

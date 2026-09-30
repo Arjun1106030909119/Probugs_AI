@@ -6,14 +6,14 @@ const jwt = require('jsonwebtoken');
 // @access  Public
 exports.register = async (req, res, next) => {
     try {
-        const { name, email, password, role } = req.body;
+        const { name, email, password } = req.body;
 
         // Create user
         const user = await User.create({
             name,
             email,
             password,
-            role: role || 'user'
+            role: 'user'
         });
 
         const io = req.app.get('socketio');
@@ -22,7 +22,7 @@ exports.register = async (req, res, next) => {
                 id: Date.now(),
                 time: new Date().toLocaleTimeString(),
                 type: 'info',
-                msg: `Registry: New user node created - ${name} [${role || 'user'}]`
+                msg: `Registry: New user node created - ${name} [user]`
             });
         }
 

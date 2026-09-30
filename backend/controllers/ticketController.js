@@ -89,6 +89,10 @@ exports.createTicket = async (req, res, next) => {
         // Merge AI insights into ticket data
         Object.assign(req.body, analysis);
 
+        // If the client didn't specify priority or category, let AI assume it
+        req.body.category = req.body.category || analysis.aiCategory;
+        req.body.priority = req.body.priority || analysis.aiPriority;
+
         // Calculate SLA Deadline
         req.body.slaDeadline = slaService.calculateDeadline(req.body.priority || req.body.aiPriority);
 
@@ -282,6 +286,32 @@ exports.addActivity = async (req, res, next) => {
             success: true,
             data: updatedTicket
         });
+    } catch (err) {
+        res.status(400).json({ success: false, error: err.message });
+    }
+};
+
+// @desc    Create new ticket from guest (extension)
+// @route   POST /api/tickets/guest
+// @access  Public
+exports.createGuestTicket = async (req, res, next) => {
+    try {
+        const User = require('../models/User');
+        let guestUser = await User.findOne({ email: 'guest@probugs.ai' });
+        
+        if (!guestUser) {
+            guestUser = await User.create({
+                name: 'Guest User',
+                email: 'guest@probugs.ai',
+                password: 'GuestPassword123!',
+                role: 'user'
+            });
+        }
+        
+        // Attach guest user ID to request and call standard createTicket method
+        req.user = { id: guestUser._id, role: guestUser.role };
+        
+        return exports.createTicket(req, res, next);
     } catch (err) {
         res.status(400).json({ success: false, error: err.message });
     }

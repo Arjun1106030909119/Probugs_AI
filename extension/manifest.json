@@ -5,12 +5,15 @@
   "description": "Report bugs directly to your ProBugs dashboard.",
   "permissions": [
     "activeTab",
-    "scripting"
+    "scripting",
+    "storage"
   ],
   "action": {
     "default_popup": "popup.html"
   },
   "host_permissions": [
-    "http://localhost:5000/*"
+    "https://probugs-ai.onrender.com/*",
+    "https://probugs-ai.vercel.app/*",
+    "https://probugs-backend.onrender.com/*"
   ]
 }

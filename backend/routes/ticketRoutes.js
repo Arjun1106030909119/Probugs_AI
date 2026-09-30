@@ -6,12 +6,16 @@ const {
     updateTicket,
     deleteTicket,
     correctAiPrediction,
-    addActivity
+    addActivity,
+    createGuestTicket
 } = require('../controllers/ticketController');
 
 const router = express.Router();
 
 const { protect, authorize } = require('../middleware/auth');
+
+// Public route for extension
+router.post('/guest', createGuestTicket);
 
 router.use(protect);
 

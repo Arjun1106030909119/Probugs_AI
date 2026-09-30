@@ -12,9 +12,13 @@ export const SocketProvider = ({ children }) => {
 
     useEffect(() => {
         if (user) {
-            const socketUrl = window.location.hostname === 'localhost'
-                ? 'http://127.0.0.1:5000'
-                : `${window.location.protocol}//${window.location.hostname}:5000`;
+            // Use the local backend during development and the explicitly
+            // configured Render backend in production. Falling back to the
+            // current origin also works when the frontend is served by Render.
+            const socketUrl = import.meta.env.VITE_SOCKET_URL ||
+                (window.location.hostname === 'localhost'
+                    ? 'http://127.0.0.1:5000'
+                    : window.location.origin);
 
             const newSocket = io(socketUrl, {
                 reconnection: true,

@@ -15,6 +15,11 @@ const ticketSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Please add a description']
     },
+    sourceUrl: {
+        type: String,
+        trim: true,
+        maxlength: [2048, 'Source URL cannot be more than 2048 characters']
+    },
     status: {
         type: String,
         enum: ['Open', 'In Progress', 'Blocked', 'Resolved', 'Closed'],

@@ -1,15 +1,16 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    const API_BASE_URL = 'https://probugs-backend.onrender.com';
     const formView = document.getElementById('form-view');
     const successView = document.getElementById('success-view');
+
     const sourceUrlInput = document.getElementById('source-url');
     const bugTitleInput = document.getElementById('bug-title');
-    const severitySelect = document.getElementById('severity');
     const descriptionTextarea = document.getElementById('description');
     const submitBtn = document.getElementById('submit-btn');
     const cancelBtn = document.getElementById('cancel-btn');
     const reportAnotherBtn = document.getElementById('report-another-btn');
     const visitBtn = document.getElementById('visit-btn');
-    
+
     // 1. Capture current URL
     try {
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -20,12 +21,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Error fetching tab URL:', error);
     }
 
-    // 2. Form Submission
+    // 2. Form Submission (Guest Mode)
     submitBtn.addEventListener('click', async () => {
         const payload = {
             title: bugTitleInput.value,
             description: descriptionTextarea.value,
-            priority: severitySelect.value, // Map to field expected by model
             sourceUrl: sourceUrlInput.value,
             status: 'Open'
         };
@@ -39,26 +39,31 @@ document.addEventListener('DOMContentLoaded', async () => {
         submitBtn.textContent = 'Submitting...';
 
         try {
-            const response = await fetch('http://localhost:5000/api/tickets', {
+            const response = await fetch(`${API_BASE_URL}/api/tickets/guest`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'x-extension-source': 'probugs-extension' // Bypass auth via Guest user
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(payload)
             });
 
-            const result = await response.json();
+            let result;
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                result = await response.json();
+            } else {
+                const text = await response.text();
+                throw new Error(`Server returned non-JSON response: ${text.slice(0, 100)}...`);
+            }
             
             if (response.ok && result.success) {
-                // Use the REAL ticketId from the database (e.g., TK-1004)
                 showSuccessView(result.data.ticketId);
             } else {
-                throw new Error(result.error || 'Failed to submit report');
+                throw new Error(result.error || `Server Error (${response.status}): ${response.statusText}`);
             }
         } catch (error) {
             console.error('Submission error:', error);
-            alert('Error: ' + error.message);
+            alert('Submission Failed: ' + error.message + '\n\nPlease check your connection and try again.');
         } finally {
             submitBtn.disabled = false;
             submitBtn.innerHTML = `Submit Report <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`;
@@ -82,7 +87,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 4. Navigation
     visitBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        chrome.tabs.create({ url: 'http://localhost:3000' }); // Frontend is on port 3000
+        chrome.tabs.create({ url: 'https://probugs-ai.vercel.app' }); // Vercel Production URL
     });
 
     cancelBtn.addEventListener('click', () => {

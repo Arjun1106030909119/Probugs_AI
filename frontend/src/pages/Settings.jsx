@@ -58,7 +58,8 @@ const Settings = () => {
             // Note: In a real app, you might want to update the global auth context here
             // For now, the user might need to refresh or we assume the context updates
         } catch (err) {
-            setError(err.response?.data?.error || 'Failed to update profile');
+            const errorMsg = err.response?.data?.error || 'Failed to update profile';
+            setError(typeof errorMsg === 'string' ? errorMsg : 'Failed to update profile');
         } finally {
             setLoading(false);
             setTimeout(() => setSuccess(null), 3000);
@@ -83,7 +84,8 @@ const Settings = () => {
             });
             setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
         } catch (err) {
-            setError(err.response?.data?.error || 'Failed to update password');
+            const errorMsg = err.response?.data?.error || 'Failed to update password';
+            setError(typeof errorMsg === 'string' ? errorMsg : 'Failed to update password');
         } finally {
             setLoading(false);
             setTimeout(() => setSuccess(null), 3000);

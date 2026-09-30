@@ -1,0 +1,22 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "env": {
+    "VITE_API_URL": "/api",
+    "VITE_SOCKET_URL": "https://probugs-backend.onrender.com"
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://probugs-backend.onrender.com/api/$1"
+    },
+    {
+      "source": "/socket.io/(.*)",
+      "destination": "https://probugs-backend.onrender.com/socket.io/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

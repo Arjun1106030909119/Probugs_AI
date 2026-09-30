@@ -172,4 +172,4 @@ When extending this system, follow these patterns:
 - **New endpoint**: Create route file → mount in server.js → add controller with `emitRealTime()` helper
 - **New real-time event**: Emit in controller → listen in App.jsx `GlobalListeners` or specific page
 - **New User role**: Update User model enum → add route `authorize()` checks → update frontend role checks
-- **Database field**: Add to Ticket or User model → update controllers → backfill existing records if needed
+- **Database field**: Add to Ticket or User model → update controllers → backfill existing records if needed"# Probugs_AI" 
